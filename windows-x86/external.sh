@@ -2,15 +2,39 @@
 
 set -e
 
+FREEIMAGE_SHA=3532c976f9853219d42d8cbab6c1f4c0990e3ed8
 PINMAME_SHA=872f7796d4c96567e38e764d4f5f5224efc7c9d4
-SDL_SHA=535d80badefc83c5c527ec5748f2a20d6a9310fe
-SDL_IMAGE_SHA=4ff27afa450eabd2a827e49ed86fab9e3bf826c5
-SDL_TTF_SHA=5e651ee5054a95fdb91702ba1b398d751155febc
-SDL_MIXER_SHA=af6a29df4e14c6ce72608b3ccd49cf35e1014255
+SDL_SHA=2fa1e7258a1fd9e3a7a546218b5ed1564953ad39
+SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
+SDL_TTF_SHA=07e4d1241817f2c0f81749183fac5ec82d7bbd72
+SDL_MIXER_SHA=4be37aed1a4b76df71a814fbfa8ec9983f3b5508
 
 mkdir -p tmp/build-libs/windows-x86
 mkdir -p tmp/runtime-libs/windows-x86
 mkdir -p tmp/include
+
+#curl -sL https://github.com/toxieainc/freeimage/archive/${FREEIMAGE_SHA}.zip -o freeimage-${FREEIMAGE_SHA}.zip
+#unzip freeimage-${FREEIMAGE_SHA}.zip
+#cd freeimage-${FREEIMAGE_SHA}
+
+curl -sL https://downloads.sourceforge.net/project/freeimage/Source%20Distribution/3.18.0/FreeImage3180.zip -o FreeImage3180.zip
+unzip FreeImage3180.zip
+cd FreeImage
+cp ../patches/FreeImage/CMakeLists.txt .
+cp ../patches/FreeImage/ImfAttribute.cpp Source/OpenEXR/IlmImf/ImfAttribute.cpp
+cmake -G "Visual Studio 17 2022" \
+   -A Win32 \
+   -DPLATFORM=win \
+   -DARCH=x86 \
+   -DBUILD_SHARED=ON \
+   -DBUILD_STATIC=OFF \
+   -B build
+cmake --build build --config Release
+cp build/Release/freeimage.lib ../tmp/build-libs/windows-x86
+cp build/Release/freeimage.dll ../tmp/runtime-libs/windows-x86
+cp Source/FreeImage.h ../tmp/include
+cmake --build build --config Release
+cd ..
 
 curl -sL https://github.com/vbousquet/pinmame/archive/${PINMAME_SHA}.zip -o pinmame-${PINMAME_SHA}.zip
 unzip pinmame-${PINMAME_SHA}.zip
