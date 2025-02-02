@@ -1,4 +1,4 @@
-name: vpinball-sdl3-windows
+name: vpinball-windows
 on:
   push:
 
@@ -17,7 +17,6 @@ jobs:
           - name: windows-x86
     steps:
       - uses: actions/checkout@v4
-      - uses: microsoft/setup-msbuild@v2
       - run: |
           ${{ matrix.platform.name }}/external.sh
       - name: Upload artifacts
