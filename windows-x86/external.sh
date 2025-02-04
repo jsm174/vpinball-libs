@@ -8,10 +8,30 @@ SDL_SHA=2fa1e7258a1fd9e3a7a546218b5ed1564953ad39
 SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
 SDL_TTF_SHA=07e4d1241817f2c0f81749183fac5ec82d7bbd72
 SDL_MIXER_SHA=4be37aed1a4b76df71a814fbfa8ec9983f3b5508
+BGFX_CMAKE_VERSION=1.129.8863-490
+BGFX_PATCH_SHA=1d0967155c375155d1f778ded4061f35c80fc96f
 
 mkdir -p tmp/build-libs/windows-x86
 mkdir -p tmp/runtime-libs/windows-x86
 mkdir -p tmp/include
+
+curl -sL https://github.com/bkaradzic/bgfx.cmake/releases/download/v${BGFX_CMAKE_VERSION}/bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz -o bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz
+tar -xvzf bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz
+curl -sL https://github.com/vbousquet/bgfx/archive/${BGFX_PATCH_SHA}.zip -o bgfx.zip
+unzip bgfx.zip
+cd bgfx.cmake
+rm -rf bgfx
+mv ../bgfx-${BGFX_PATCH_SHA} bgfx
+cmake -G "Visual Studio 17 2022" -A Win32 \
+   -S. \
+   -DBGFX_LIBRARY_TYPE=SHARED \
+   -DBGFX_BUILD_EXAMPLES=OFF \
+   -DBGFX_CONFIG_MULTITHREADED=ON \
+   -DBGFX_CONFIG_MAX_FRAME_BUFFERS=256 \
+   -B build
+cmake --build build --config Release
+ls -laRt
+cd ..
 
 curl -sL https://github.com/toxieainc/freeimage/archive/${FREEIMAGE_SHA}.zip -o freeimage-${FREEIMAGE_SHA}.zip
 unzip freeimage-${FREEIMAGE_SHA}.zip
