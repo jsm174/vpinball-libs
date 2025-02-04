@@ -13,15 +13,10 @@ mkdir -p tmp/build-libs/windows-x64
 mkdir -p tmp/runtime-libs/windows-x64
 mkdir -p tmp/include
 
-#curl -sL https://github.com/toxieainc/freeimage/archive/${FREEIMAGE_SHA}.zip -o freeimage-${FREEIMAGE_SHA}.zip
-#unzip freeimage-${FREEIMAGE_SHA}.zip
-#cd freeimage-${FREEIMAGE_SHA}
-
-curl -sL https://downloads.sourceforge.net/project/freeimage/Source%20Distribution/3.18.0/FreeImage3180.zip -o FreeImage3180.zip
-unzip FreeImage3180.zip
-cd FreeImage
+curl -sL https://github.com/toxieainc/freeimage/archive/${FREEIMAGE_SHA}.zip -o freeimage-${FREEIMAGE_SHA}.zip
+unzip freeimage-${FREEIMAGE_SHA}.zip
+cd freeimage-${FREEIMAGE_SHA}
 cp ../patches/FreeImage/CMakeLists.txt .
-cp ../patches/FreeImage/ImfAttribute.cpp Source/OpenEXR/IlmImf/ImfAttribute.cpp
 cmake -G "Visual Studio 17 2022" \
    -DPLATFORM=win \
    -DARCH=x64 \
