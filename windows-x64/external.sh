@@ -3,8 +3,8 @@
 set -e
 
 FREEIMAGE_SHA=3532c976f9853219d42d8cbab6c1f4c0990e3ed8
-PINMAME_SHA=cea0b609e75d199296d0e153ad85d98ef54f2970
-SDL_SHA=2fa1e7258a1fd9e3a7a546218b5ed1564953ad39
+PINMAME_SHA=62b70673f58b22a3945e6c1dce70757207a54834
+SDL_SHA=b5c3eab6b447111d3c7879bb547b80fb4abd9063
 SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
 SDL_TTF_SHA=07e4d1241817f2c0f81749183fac5ec82d7bbd72
 SDL_MIXER_SHA=4be37aed1a4b76df71a814fbfa8ec9983f3b5508
@@ -44,6 +44,7 @@ cmake --build build --config Release
 cp build/Release/pinmame64.lib ../tmp/build-libs/windows-x64
 cp build/Release/pinmame64.dll ../tmp/runtime-libs/windows-x64
 cp src/libpinmame/libpinmame.h ../tmp/include
+cp src/libpinmame/pinmamedef.h ../tmp/include
 cd ..
 
 curl -sL https://github.com/libsdl-org/SDL/archive/${SDL_SHA}.zip -o SDL-${SDL_SHA}.zip
