@@ -8,6 +8,7 @@ SDL_SHA=b5c3eab6b447111d3c7879bb547b80fb4abd9063
 SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
 SDL_TTF_SHA=07e4d1241817f2c0f81749183fac5ec82d7bbd72
 SDL_MIXER_SHA=4be37aed1a4b76df71a814fbfa8ec9983f3b5508
+LIBSERUM_SHA=b0cc2a871d9d5b6395658c56c65402ae388eb78c
 
 mkdir -p tmp/build-libs/windows-x86
 mkdir -p tmp/runtime-libs/windows-x86
@@ -17,7 +18,8 @@ curl -sL https://github.com/toxieainc/freeimage/archive/${FREEIMAGE_SHA}.zip -o 
 unzip freeimage-${FREEIMAGE_SHA}.zip
 cd freeimage-${FREEIMAGE_SHA}
 cp ../patches/FreeImage/CMakeLists.txt .
-cmake -G "Visual Studio 17 2022" \
+cmake \
+   -G "Visual Studio 17 2022" \
    -A Win32 \
    -DPLATFORM=win \
    -DARCH=x86 \
@@ -35,7 +37,8 @@ curl -sL https://github.com/vbousquet/pinmame/archive/${PINMAME_SHA}.zip -o pinm
 unzip pinmame-${PINMAME_SHA}.zip
 cd pinmame-${PINMAME_SHA}
 cp cmake/libpinmame/CMakelists.txt .
-cmake -G "Visual Studio 17 2022" \
+cmake \
+   -G "Visual Studio 17 2022" \
    -A Win32 \
    -DPLATFORM=win \
    -DARCH=x86 \
@@ -52,7 +55,9 @@ cd ..
 curl -sL https://github.com/libsdl-org/SDL/archive/${SDL_SHA}.zip -o SDL-${SDL_SHA}.zip
 unzip SDL-${SDL_SHA}.zip
 cd SDL-${SDL_SHA}
-cmake -G "Visual Studio 17 2022" -A Win32 \
+cmake \
+   -G "Visual Studio 17 2022" \
+   -A Win32 \
    -DSDL_SHARED=ON \
    -DSDL_STATIC=OFF \
    -DSDL_TEST_LIBRARY=OFF \
@@ -68,7 +73,9 @@ curl -sL https://github.com/libsdl-org/SDL_image/archive/${SDL_IMAGE_SHA}.zip -o
 unzip SDL_image-${SDL_IMAGE_SHA}.zip
 cd SDL_image-${SDL_IMAGE_SHA}
 external/download.sh
-cmake -G "Visual Studio 17 2022" -A Win32 \
+cmake \
+   -G "Visual Studio 17 2022" \
+   -A Win32 \
    -DBUILD_SHARED_LIBS=ON \
    -DSDLIMAGE_SAMPLES=OFF \
    -DSDLIMAGE_DEPS_SHARED=ON \
@@ -88,7 +95,9 @@ curl -sL https://github.com/libsdl-org/SDL_ttf/archive/${SDL_TTF_SHA}.zip -o SDL
 unzip SDL_ttf-${SDL_TTF_SHA}.zip
 cd SDL_ttf-${SDL_TTF_SHA}
 external/download.sh
-cmake -G "Visual Studio 17 2022" -A Win32 \
+cmake \
+   -G "Visual Studio 17 2022" \
+   -A Win32 \
    -DBUILD_SHARED_LIBS=ON \
    -DSDLTTF_SAMPLES=OFF \
    -DSDLTTF_VENDORED=ON \
@@ -106,7 +115,9 @@ curl -sL https://github.com/libsdl-org/SDL_mixer/archive/${SDL_MIXER_SHA}.zip -o
 unzip SDL_mixer-${SDL_MIXER_SHA}.zip
 cd SDL_mixer-${SDL_MIXER_SHA}
 external/download.sh
-cmake -G "Visual Studio 17 2022" -A Win32 \
+cmake \
+   -G "Visual Studio 17 2022" \
+   -A Win32 \
    -DBUILD_SHARED_LIBS=ON \
    -DSDLMIXER_SAMPLES=OFF \
    -DSDLMIXER_VENDORED=ON \
@@ -117,4 +128,22 @@ cp build/Release/SDL3_mixer.lib ../tmp/build-libs/windows-x86
 cp build/Release/SDL3_mixer.dll ../tmp/runtime-libs/windows-x86
 mkdir -p ../tmp/include/SDL3_mixer
 cp -r include/SDL3_mixer/* ../tmp/include/SDL3_mixer
+cd ..
+
+curl -sL https://github.com/zesinger/libserum/archive/${LIBSERUM_SHA}.zip -o libserum.zip
+unzip libserum.zip
+cd libserum-$LIBSERUM_SHA
+cmake \
+   -G "Visual Studio 17 2022" \
+   -A Win32 \
+   -DPLATFORM=win \
+   -DARCH=x86 \
+   -DBUILD_SHARED=ON \
+   -DBUILD_STATIC=OFF \
+   -B build
+cmake --build build --config Release
+cp build/Release/serum.lib ../tmp/build-libs/windows-x86
+cp build/Release/serum.dll ../tmp/runtime-libs/windows-x86
+cp src/serum.h ../tmp/include
+cp src/serum-decode.h ../tmp/include
 cd ..
