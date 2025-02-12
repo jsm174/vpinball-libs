@@ -25,3 +25,13 @@ jobs:
           name: libraries-${{ matrix.platform.name }}
           path: tmp
 
+  merge:
+    name: Merge 
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/upload-artifact/merge@v4
+        with:
+          name: libraries
+          pattern: libraries-windows
+          delete-merged: true
