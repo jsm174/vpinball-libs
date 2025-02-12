@@ -32,6 +32,6 @@ jobs:
     steps:
       - uses: actions/upload-artifact/merge@v4
         with:
-          name: libraries
-          pattern: libraries-windows
+          name: libraries-windows
+          pattern: libraries-*
           delete-merged: true
