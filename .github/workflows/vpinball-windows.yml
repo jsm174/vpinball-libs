@@ -17,6 +17,8 @@ jobs:
           - name: windows-x86
     steps:
       - uses: actions/checkout@v4
+      - name: Add msbuild to path (win runner)
+        uses: microsoft/setup-msbuild@v2
       - run: |
           ${{ matrix.platform.name }}/external.sh
       - name: Upload artifacts
