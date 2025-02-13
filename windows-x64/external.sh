@@ -2,7 +2,7 @@
 
 set -e
 
-FREEIMAGE_SHA=3532c976f9853219d42d8cbab6c1f4c0990e3ed8
+FREEIMAGE_SHA=48baac1f25b2aa8396ecbf795f0fb5cfa72b055e
 PINMAME_SHA=be86b9665cf9bda306d0a7ae9d6c7fdfc4679b71
 SDL_SHA=b5c3eab6b447111d3c7879bb547b80fb4abd9063
 SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
@@ -17,7 +17,6 @@ mkdir -p tmp/include
 curl -sL https://github.com/toxieainc/freeimage/archive/${FREEIMAGE_SHA}.zip -o freeimage-${FREEIMAGE_SHA}.zip
 unzip freeimage-${FREEIMAGE_SHA}.zip
 cd freeimage-${FREEIMAGE_SHA}
-cp ../patches/FreeImage/CMakeLists.txt .
 cmake \
    -G "Visual Studio 17 2022" \
    -DPLATFORM=win \
