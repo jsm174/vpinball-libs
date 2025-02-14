@@ -11,10 +11,29 @@ BGFX_CMAKE_VERSION=1.129.8863-490
 BGFX_PATCH_SHA=1d0967155c375155d1f778ded4061f35c80fc96f
 PINMAME_SHA=be86b9665cf9bda306d0a7ae9d6c7fdfc4679b71
 LIBDMDUTIL_SHA=c7b28ff9b26d206820f438a54c9bc89171a3ae02
+FFMPEG_SHA=b08d7969c550a804a59511c7b83f2dd8cc0499b8
 
 mkdir -p tmp/build-libs/windows-x86
 mkdir -p tmp/runtime-libs/windows-x86
 mkdir -p tmp/include
+
+curl -sL https://github.com/FFmpeg/FFmpeg/archive/${FFMPEG_SHA}.tar.gz -o ffmpeg-${FFMPEG_SHA}.tar.gz
+tar xzf ffmpeg-${FFMPEG_SHA}.tar.gz
+mv ffmpeg-${FFMPEG_SHA} ffmpeg
+cd ffmpeg
+docker run \
+    --rm \
+    -e BUILD_ARCH=x86 \
+    -v "$(pwd):/ffmpeg" \
+    ffmpeg-windows
+for LIB in avcodec avdevice avfilter avformat avutil swresample swscale; do
+   DIR="lib${LIB}"
+   cp "${DIR}/${LIB}.lib" ../tmp/build-libs/windows-x86
+   cp "${DIR}/${LIB}.dll" ../tmp/runtime-libs/windows-x86
+   mkdir -p ../tmp/include/${DIR}
+   cp ${DIR}/*.h ../tmp/include/${DIR}
+done
+cd ..
 
 curl -sL https://github.com/libsdl-org/SDL/archive/${SDL_SHA}.tar.gz -o SDL-${SDL_SHA}.tar.gz
 tar xzf SDL-${SDL_SHA}.tar.gz
