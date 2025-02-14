@@ -7,6 +7,8 @@ SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
 SDL_TTF_SHA=07e4d1241817f2c0f81749183fac5ec82d7bbd72
 SDL_MIXER_SHA=4be37aed1a4b76df71a814fbfa8ec9983f3b5508
 FREEIMAGE_SHA=48baac1f25b2aa8396ecbf795f0fb5cfa72b055e
+BGFX_CMAKE_VERSION=1.129.8863-490
+BGFX_PATCH_SHA=1d0967155c375155d1f778ded4061f35c80fc96f
 PINMAME_SHA=be86b9665cf9bda306d0a7ae9d6c7fdfc4679b71
 LIBDMDUTIL_SHA=c7b28ff9b26d206820f438a54c9bc89171a3ae02
 
@@ -108,6 +110,34 @@ cmake --build build --config Release
 cp build/Release/freeimage.lib ../tmp/build-libs/windows-x86
 cp build/Release/freeimage.dll ../tmp/runtime-libs/windows-x86
 cp Source/FreeImage.h ../tmp/include
+cd ..
+
+curl -sL https://github.com/bkaradzic/bgfx.cmake/releases/download/v${BGFX_CMAKE_VERSION}/bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz -o bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz
+tar xzf bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz
+curl -sL https://github.com/vbousquet/bgfx/archive/${BGFX_PATCH_SHA}.tar.gz -o bgfx-${BGFX_PATCH_SHA}.tar.gz
+tar xzf bgfx-${BGFX_PATCH_SHA}.tar.gz
+cd bgfx.cmake
+rm -rf bgfx
+mv ../bgfx-${BGFX_PATCH_SHA} bgfx
+cmake -G "Visual Studio 17 2022" \
+   -S. \
+   -A Win32 \
+   -DBGFX_LIBRARY_TYPE=SHARED \
+   -DBGFX_BUILD_TOOLS=OFF \
+   -DBGFX_BUILD_EXAMPLES=OFF \
+   -DBGFX_CONFIG_MULTITHREADED=ON \
+   -DBGFX_CONFIG_MAX_FRAME_BUFFERS=256 \
+   -B build
+cmake --build build --config Release
+cp build/cmake/bgfx/Release/bgfx.lib ../tmp/build-libs/windows-x86
+cp build/cmake/bgfx/Release/bgfx.dll ../tmp/runtime-libs/windows-x86
+cp -r bgfx/include/bgfx ../tmp/include/
+cp build/cmake/bimg/Release/bimg.lib ../tmp/build-libs/windows-x86
+cp build/cmake/bimg/Release/bimg_decode.lib ../tmp/build-libs/windows-x86
+cp build/cmake/bimg/Release/bimg_encode.lib ../tmp/build-libs/windows-x86
+cp -r bimg/include/bimg ../tmp/include/
+cp build/cmake/bx/Release/bx.lib ../tmp/build-libs/windows-x86
+cp -r bx/include/bx ../tmp/include/
 cd ..
 
 curl -sL https://github.com/vbousquet/pinmame/archive/${PINMAME_SHA}.zip -o pinmame-${PINMAME_SHA}.zip

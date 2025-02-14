@@ -7,6 +7,8 @@ SDL_IMAGE_SHA=4a762bdfb7b43dae7a8a818567847881e49bdab4
 SDL_TTF_SHA=07e4d1241817f2c0f81749183fac5ec82d7bbd72
 SDL_MIXER_SHA=4be37aed1a4b76df71a814fbfa8ec9983f3b5508
 FREEIMAGE_SHA=48baac1f25b2aa8396ecbf795f0fb5cfa72b055e
+BGFX_CMAKE_VERSION=1.129.8863-490
+BGFX_PATCH_SHA=1d0967155c375155d1f778ded4061f35c80fc96f
 PINMAME_SHA=be86b9665cf9bda306d0a7ae9d6c7fdfc4679b71
 LIBDMDUTIL_SHA=c7b28ff9b26d206820f438a54c9bc89171a3ae02
 
@@ -18,7 +20,7 @@ curl -sL https://github.com/libsdl-org/SDL/archive/${SDL_SHA}.tar.gz -o SDL-${SD
 tar xzf SDL-${SDL_SHA}.tar.gz
 mv SDL-${SDL_SHA} SDL
 cd SDL
-sed -i 's/OUTPUT_NAME "SDL3"/OUTPUT_NAME "SDL364"/' CMakeLists.txt
+perl -i -pe 's/OUTPUT_NAME "SDL3"/OUTPUT_NAME "SDL364"/' CMakeLists.txt
 cmake \
    -G "Visual Studio 17 2022" \
    -DSDL_SHARED=ON \
@@ -36,7 +38,7 @@ tar xzf SDL_image-${SDL_IMAGE_SHA}.tar.gz --exclude='*/Xcode/*'
 mv SDL_image-${SDL_IMAGE_SHA} SDL_image
 cd SDL_image
 ./external/download.sh
-sed -i 's/OUTPUT_NAME "SDL3_image"/OUTPUT_NAME "SDL3_image64"/' CMakeLists.txt
+perl -i -pe 's/OUTPUT_NAME "SDL3_image"/OUTPUT_NAME "SDL3_image64"/' CMakeLists.txt
 cmake \
    -G "Visual Studio 17 2022" \
    -DBUILD_SHARED_LIBS=ON \
@@ -58,7 +60,7 @@ tar xzf SDL_ttf-${SDL_TTF_SHA}.tar.gz --exclude='*/Xcode/*'
 mv SDL_ttf-${SDL_TTF_SHA} SDL_ttf
 cd SDL_ttf
 ./external/download.sh
-sed -i 's/OUTPUT_NAME SDL3_ttf/OUTPUT_NAME "SDL3_ttf64"/' CMakeLists.txt
+perl -i -pe 's/OUTPUT_NAME SDL3_ttf/OUTPUT_NAME SDL3_ttf64/' CMakeLists.txt
 cmake \
    -G "Visual Studio 17 2022" \
    -DBUILD_SHARED_LIBS=ON \
@@ -78,7 +80,7 @@ tar xzf SDL_mixer-${SDL_MIXER_SHA}.tar.gz --exclude='*/Xcode/*'
 mv SDL_mixer-${SDL_MIXER_SHA} SDL_mixer
 cd SDL_mixer
 ./external/download.sh
-sed -i 's/OUTPUT_NAME "SDL3_mixer"/OUTPUT_NAME "SDL3_mixer64"/' CMakeLists.txt
+perl -i -pe 's/OUTPUT_NAME "SDL3_mixer"/OUTPUT_NAME "SDL3_mixer64"/' CMakeLists.txt
 cmake \
    -G "Visual Studio 17 2022" \
    -DBUILD_SHARED_LIBS=ON \
@@ -107,6 +109,38 @@ cmake --build build --config Release
 cp build/Release/freeimage64.lib ../tmp/build-libs/windows-x64
 cp build/Release/freeimage64.dll ../tmp/runtime-libs/windows-x64
 cp Source/FreeImage.h ../tmp/include
+cd ..
+
+curl -sL https://github.com/bkaradzic/bgfx.cmake/releases/download/v${BGFX_CMAKE_VERSION}/bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz -o bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz
+tar xzf bgfx.cmake.v${BGFX_CMAKE_VERSION}.tar.gz
+curl -sL https://github.com/vbousquet/bgfx/archive/${BGFX_PATCH_SHA}.tar.gz -o bgfx-${BGFX_PATCH_SHA}.tar.gz
+tar xzf bgfx-${BGFX_PATCH_SHA}.tar.gz
+cd bgfx.cmake
+rm -rf bgfx
+mv ../bgfx-${BGFX_PATCH_SHA} bgfx
+perl -i -pe 's/set_target_properties\(bx PROPERTIES FOLDER "bgfx"\)/set_target_properties(bx PROPERTIES FOLDER "bgfx" OUTPUT_NAME "bx64")/' cmake/bx/bx.cmake
+perl -i -pe 's/set_target_properties\(bimg PROPERTIES FOLDER "bgfx"\)/set_target_properties(bimg PROPERTIES FOLDER "bgfx" OUTPUT_NAME "bimg64")/' cmake/bimg/bimg.cmake
+perl -i -pe 's/set_target_properties\(bimg_decode PROPERTIES FOLDER "bgfx"\)/set_target_properties(bimg_decode PROPERTIES FOLDER "bgfx" OUTPUT_NAME "bimg_decode64")/' cmake/bimg/bimg_decode.cmake
+perl -i -pe 's/set_target_properties\(bimg_encode PROPERTIES FOLDER "bgfx"\)/set_target_properties(bimg_encode PROPERTIES FOLDER "bgfx" OUTPUT_NAME "bimg_encode64")/' cmake/bimg/bimg_encode.cmake
+perl -i -pe 's/set_target_properties\(bgfx PROPERTIES FOLDER "bgfx"\)/set_target_properties(bgfx PROPERTIES FOLDER "bgfx" OUTPUT_NAME "bgfx64")/' cmake/bgfx/bgfx.cmake
+cmake -G "Visual Studio 17 2022" \
+   -S. \
+   -DBGFX_LIBRARY_TYPE=SHARED \
+   -DBGFX_BUILD_TOOLS=OFF \
+   -DBGFX_BUILD_EXAMPLES=OFF \
+   -DBGFX_CONFIG_MULTITHREADED=ON \
+   -DBGFX_CONFIG_MAX_FRAME_BUFFERS=256 \
+   -B build
+cmake --build build --config Release
+cp build/cmake/bgfx/Release/bgfx64.lib ../tmp/build-libs/windows-x64
+cp build/cmake/bgfx/Release/bgfx64.dll ../tmp/runtime-libs/windows-x64
+cp -r bgfx/include/bgfx ../tmp/include/
+cp build/cmake/bimg/Release/bimg64.lib ../tmp/build-libs/windows-x64
+cp build/cmake/bimg/Release/bimg_decode64.lib ../tmp/build-libs/windows-x64
+cp build/cmake/bimg/Release/bimg_encode64.lib ../tmp/build-libs/windows-x64
+cp -r bimg/include/bimg ../tmp/include/
+cp build/cmake/bx/Release/bx64.lib ../tmp/build-libs/windows-x64
+cp -r bx/include/bx ../tmp/include/
 cd ..
 
 curl -sL https://github.com/vbousquet/pinmame/archive/${PINMAME_SHA}.zip -o pinmame-${PINMAME_SHA}.zip
