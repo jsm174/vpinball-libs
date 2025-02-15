@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   build:
-    name: Build
+    name: Build ${{ matrix.platform.name }}
     runs-on: windows-2025
     strategy:
       matrix:
@@ -26,10 +26,30 @@ jobs:
           name: libraries-${{ matrix.platform.name }}
           path: tmp
 
+  build-ffmpeg:
+    name: Build ffmpeg-${{ matrix.platform.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform:
+          - name: windows-x64
+          - name: windows-x86
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get install gcc-mingw-w64-x86-64 gcc-mingw-w64-i686 nasm
+      - run: |
+          ./${{ matrix.platform.name }}/external-ffmpeg.sh
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libraries-ffmpeg-${{ matrix.platform.name }}
+          path: tmp
+
   merge:
     name: Merge 
     runs-on: ubuntu-latest
-    needs: build
+    needs: [ build, build-ffmpeg ]
     steps:
       - uses: actions/upload-artifact/merge@v4
         with:
