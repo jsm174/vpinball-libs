@@ -10,6 +10,7 @@ FREEIMAGE_SHA=48baac1f25b2aa8396ecbf795f0fb5cfa72b055e
 BGFX_CMAKE_VERSION=1.129.8863-490
 BGFX_PATCH_SHA=1d0967155c375155d1f778ded4061f35c80fc96f
 PINMAME_SHA=be86b9665cf9bda306d0a7ae9d6c7fdfc4679b71
+OPENXR_SHA=b15ef6ce120dad1c7d3ff57039e73ba1a9f17102
 LIBDMDUTIL_SHA=c7b28ff9b26d206820f438a54c9bc89171a3ae02
 
 mkdir -p tmp/build-libs/windows-x86
@@ -157,6 +158,22 @@ cp build/Release/pinmame.lib ../tmp/build-libs/windows-x86
 cp build/Release/pinmame.dll ../tmp/runtime-libs/windows-x86
 cp src/libpinmame/libpinmame.h ../tmp/include
 cp src/libpinmame/pinmamedef.h ../tmp/include
+cd ..
+
+curl -sL https://github.com/KhronosGroup/OpenXR-SDK-Source/archive/${OPENXR_SHA}.tar.gz -o OpenXR-SDK-Source-${OPENXR_SHA}.zip
+tar xzf OpenXR-SDK-Source-${OPENXR_SHA}.zip
+mv OpenXR-SDK-Source-${OPENXR_SHA} openxr
+cd openxr
+cmake \
+   -G "Visual Studio 17 2022" \
+   -A Win32 \
+   -DBUILD_TESTS=OFF \
+   -DDYNAMIC_LOADER=ON \
+   -B build
+cmake --build build --config Release
+cp build/src/loader/Release/openxr_loader.lib ../tmp/build-libs/windows-x86
+cp build/src/loader/Release/openxr_loader.dll ../tmp/runtime-libs/windows-x86
+cp -r include/openxr ../tmp/include
 cd ..
 
 curl -sL https://github.com/vpinball/libdmdutil/archive/${LIBDMDUTIL_SHA}.tar.gz -o libdmdutil-${LIBDMDUTIL_SHA}.tar.gz
