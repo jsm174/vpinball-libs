@@ -12,16 +12,21 @@ curl -sL https://github.com/FFmpeg/FFmpeg/archive/${FFMPEG_SHA}.tar.gz -o FFmpeg
 tar xzf FFmpeg-${FFMPEG_SHA}.tar.gz
 mv FFmpeg-${FFMPEG_SHA} ffmpeg
 cd ffmpeg
-./configure \
-    --target-os=mingw32 \
-    --arch="x86_64" \
-    --cross-prefix="x86_64-w64-mingw32-" \
-    --enable-shared \
-    --disable-static \
-    --disable-programs \
-    --disable-doc \
-    --build-suffix="64"
-make -j$(nproc)
+CURRENT_DIR="$(pwd)"
+MSYS2="/c/msys64/usr/bin/bash.exe"
+
+$MSYS2 -l -c "pacman -S --noconfirm make diffutils yasm mingw-w64-x86_64-gcc"
+$MSYS2 -l -c "cd \"$CURRENT_DIR\" && ./configure \
+  --target-os=mingw32 \
+  --arch="x86_64" \
+  --enable-shared \
+  --disable-static \
+  --disable-programs \
+  --disable-doc \
+  --build-suffix=64
+"
+$MSYS2 -l -c "cd \"$CURRENT_DIR\" && make"
+
 for LIB in avcodec avdevice avfilter avformat avutil swresample swscale; do
    DIR="lib${LIB}"
    cp "${DIR}/${LIB}64.lib" ../tmp/build-libs/windows-x64
